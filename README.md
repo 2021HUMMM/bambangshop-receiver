@@ -86,4 +86,27 @@ This is the place for you to write reflections:
 
 #### Reflection Subscriber-1
 
+1. **Why do we use RwLock<> instead of Mutex<> for synchronizing the Vec<Notification>?** </br>
+
+In this tutorial, we used RwLock<Vec<Notification>> to allow multiple readers or a single writer at a time. This is necessary because:
+
+- Efficiency with Multiple Readers: RwLock allows multiple threads to read from Vec<Notification> concurrently, as long as no thread is writing. This improves performance in scenarios where reading occurs more frequently than writing.
+- Single Writer at a Time: When a write operation is required (such as adding a new notification), RwLock ensures that only one writer can access the data at a time, preventing race conditions.
+- Better Read Performance: Compared to Mutex<Vec<Notification>>, RwLock is more efficient when reads are much more common than writes, as it allows concurrent reads instead of forcing all access to be sequential.
+
+We do not use Mutex<> in this case because:
+
+- Mutex<> only allows one thread to access the data at a time, whether it is for reading or writing. This would cause unnecessary blocking, making read-heavy operations less efficient.
+- Unlike RwLock, Mutex does not differentiate between read and write operations—every access requires exclusive ownership, which can reduce concurrency in read-heavy workloads.
+
+2. **Why does Rust not allow mutating a static variable like Java?** </br>
+
+In Rust, static variables are immutable by default, meaning they cannot be modified after initialization. However, in Java, static variables can be mutated freely using static methods. The reason Rust enforces this restriction is:
+
+- Thread Safety: If Rust allowed direct mutation of static variables, multiple threads could modify them simultaneously, leading to data races. Rust’s ownership model and borrowing rules prevent these issues.
+- Memory Safety: Allowing mutable static variables without synchronization could cause undefined behavior, as multiple parts of the program could read and write the variable without coordination.
+- Explicit Synchronization: Instead of allowing unsafe mutations, Rust forces us to use synchronization primitives like RwLock<>, Mutex<>, or lazy_static! to ensure that mutations happen safely in a concurrent environment.
+
+In contrast, Java relies on developers to use manual synchronization (like synchronized blocks) to prevent race conditions, whereas Rust enforces safety at compile-time.
+
 #### Reflection Subscriber-2
