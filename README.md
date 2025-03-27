@@ -110,3 +110,36 @@ In Rust, static variables are immutable by default, meaning they cannot be modif
 In contrast, Java relies on developers to use manual synchronization (like synchronized blocks) to prevent race conditions, whereas Rust enforces safety at compile-time.
 
 #### Reflection Subscriber-2
+
+1. Exploring Beyond the Tutorial (e.g., src/lib.rs)
+Yes, I have explored parts of the code outside of the tutorial steps, including src/lib.rs. While the tutorial mainly focused on implementing the notification system’s handlers and services, I checked lib.rs to understand how the modules were structured and how dependencies were managed.
+
+Key Learnings from Exploring lib.rs:
+
+- It serves as an entry point for module organization in Rust projects.
+- It helps expose functions, structs, and other modules to the rest of the application.
+- Understanding how mod and use statements work in Rust improves overall project organization.
+
+2. Observer Pattern and Scaling the System
+The Observer pattern simplifies adding more subscribers because:
+
+- Each subscriber (Receiver app instance) listens for notifications independently.
+- The Publisher (Main app) doesn’t need to change when new subscribers are added.
+- New Receivers can simply subscribe to notifications without modifying the core system.
+
+However, spawning multiple instances of the Main app introduces complexities:
+
+- Unlike Receivers, which only listen, the Main app actively publishes notifications.
+- Multiple Main apps might cause duplicate messages or race conditions if not handled properly.
+- A message queue or a distributed event system would be needed to synchronize multiple Main instances effectively.
+
+While adding more Receivers is straightforward, handling multiple Main instances requires additional architectural considerations.
+
+3. Writing Tests and Enhancing Postman Documentation
+
+I successfully launched multiple instances of the Receiver app, each running on different ports (8001, 8002, and 8003). This was achieved by modifying the .env file to adjust the ROCKET_PORT and APP_INSTANCE_NAME variables. After configuring these settings, I started each instance separately using cargo run in different terminal windows.
+
+To test the system, I also launched a single instance of the Main app. Using the Postman collection, I subscribed each Receiver instance to different product types. I then triggered the create Product, publish Product, and delete Product endpoints in the Main app. As expected, each Receiver instance successfully received notifications relevant to its subscription.
+
+Additionally, I tested the system with multiple product categories to verify that notifications were routed to the correct subscribers. This confirmed that the Observer pattern effectively allows multiple Receiver instances to dynamically receive updates. Postman was particularly useful during this process, as it streamlined testing by making it easy to send requests and inspect responses.
+
